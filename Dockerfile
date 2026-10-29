@@ -8,12 +8,13 @@ ENV HOST=0.0.0.0
 # Install all dependencies (including prisma for client generation)
 COPY package.json package-lock.json* ./
 COPY apps/api/package.json ./apps/api/
-RUN npm install --legacy-peer-deps
+RUN npm install --legacy-peer-deps && \
+    npm uninstall @prisma/client prisma && \
+    npm install @prisma/client@5.14.0 prisma@5.14.0 --legacy-peer-deps
 
-# Copy Prisma schema and generate client with PostgreSQL provider
+# Copy Prisma schema and generate client with SQLite provider (local generation, swap at runtime)
 COPY apps/api/prisma ./apps/api/prisma
-RUN sed -i 's/provider = "sqlite"/provider = "postgresql"/g' ./apps/api/prisma/schema.prisma && \
-    npx prisma generate --schema=/app/apps/api/prisma/schema.prisma
+RUN npx prisma generate --schema=/app/apps/api/prisma/schema.prisma
 
 # Copy pre-built API dist from local build
 COPY apps/api/dist ./apps/api/dist

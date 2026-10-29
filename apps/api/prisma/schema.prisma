@@ -7,8 +7,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
+  // At runtime this will be overridden by the DATABASE_URL env var from docker-compose
+  url      = "postgresql://itsm_user:itsm_password@db:5432/itsm?schema=public"
 }
 
 // ============================================================
