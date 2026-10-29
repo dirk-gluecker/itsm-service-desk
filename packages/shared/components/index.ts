@@ -4,43 +4,42 @@
  * Exports all design system components with consistent TypeScript interfaces
  */
 
-export { Button, ButtonProps, ButtonVariant, ButtonSize } from './Button/Button';
-export { Input, InputProps, InputSize, InputType } from './Input/Input';
-export { Select, SelectProps, SelectOption, SelectSize } from './Select/Select';
-export { Card, CardProps } from './Card/Card';
-export { Modal, ModalProps } from './Modal/Modal';
+export { Button } from './Button/Button';
+export type { ButtonProps, ButtonVariant, ButtonSize } from './Button/Button';
+export { Input } from './Input/Input';
+export type { InputProps, InputSize, InputType } from './Input/Input';
+export { Select } from './Select/Select';
+export type { SelectProps, SelectOption, SelectSize } from './Select/Select';
+export { Card, type CardProps } from './Card/Card';
+export { Modal, type ModalProps } from './Modal/Modal';
 export { 
   Table, 
-  TableProps, 
-  Column, 
-  SortDirection 
 } from './Table/Table';
+export type { TableProps, Column, SortDirection } from './Table/Table';
 export {
   Badge,
-  BadgeProps,
-  BadgeVariant,
-  BadgeSize,
   StatusBadge,
   PriorityBadge,
 } from './Badge/Badge';
+export type { BadgeProps, BadgeVariant, BadgeSize } from './Badge/Badge';
 export {
   ThemeProvider,
   useTheme,
   ThemeToggle,
   ThemeMenuDropdown,
-  ThemeContextValue,
 } from './ThemeProvider/ThemeProvider';
+export type { ThemeContextValue } from './ThemeProvider/ThemeProvider';
 export {
   ErrorBoundary,
   RouteErrorBoundary,
-  ErrorBoundaryProps,
 } from './ErrorBoundary/ErrorBoundary';
+export type { ErrorBoundaryProps } from './ErrorBoundary/ErrorBoundary';
 export {
   LoadingSpinner,
   FullPageLoader,
   SkeletonLoader,
-  LoadingSpinnerProps,
-  SpinnerSize,
-  FullPageLoaderProps,
-  SkeletonLoaderProps,
+  type LoadingSpinnerProps,
+  type SpinnerSize,
+  type FullPageLoaderProps,
+  type SkeletonLoaderProps,
 } from './LoadingSpinner/LoadingSpinner';

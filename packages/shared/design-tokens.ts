@@ -457,16 +457,16 @@ export function generateCSSVariables(theme: 'light' | 'dark' = 'light'): Record<
     '--radius-2xl': borderRadius['2xl'],
     '--radius-full': borderRadius.full,
 
-    // Z-index
-    '--z-hidden': zIndex.hidden,
-    '--z-base': zIndex.base,
-    '--z-dropdown': zIndex.dropdown,
-    '--z-sticky': zIndex.sticky,
-    '--z-banner': zIndex.banner,
-    '--z-modal-backdrop': zIndex.modalBackdrop,
-    '--z-modal': zIndex.modal,
-    '--z-popover': zIndex.popover,
-    '--z-tooltip': zIndex.tooltip,
+    // Z-index - convert to strings for CSS variables
+    '--z-hidden': String(zIndex.hidden),
+    '--z-base': String(zIndex.base),
+    '--z-dropdown': String(zIndex.dropdown),
+    '--z-sticky': String(zIndex.sticky),
+    '--z-banner': String(zIndex.banner),
+    '--z-modal-backdrop': String(zIndex.modalBackdrop),
+    '--z-modal': String(zIndex.modal),
+    '--z-popover': String(zIndex.popover),
+    '--z-tooltip': String(zIndex.tooltip),
 
     // Animations
     '--duration-faster': animation.duration.faster,
