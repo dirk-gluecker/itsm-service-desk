@@ -17,8 +17,15 @@ export async function commentRoutes(app: FastifyInstance) {
     async (request, reply) => {
       const { ticketId } = request.params as { ticketId: string };
 
-      // Check ticket exists
-      const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
+      // Check ticket exists - support both UUID and ticket key
+      let whereClause: any = {};
+      if (ticketId.startsWith('TK-')) {
+        whereClause = { key: ticketId };
+      } else {
+        whereClause = { id: ticketId };
+      }
+
+      const ticket = await prisma.ticket.findFirst({ where: whereClause });
 
       if (!ticket) {
         return reply.status(404).send({
@@ -39,8 +46,8 @@ export async function commentRoutes(app: FastifyInstance) {
         });
       }
 
-      // Build where clause
-      const where: any = { ticketId };
+      // Build where clause - use ticket.id (UUID), not the Key
+      const where: any = { ticketId: ticket.id };
 
       // Customers cannot see internal comments
       if (request.user!.role === 'CUSTOMER') {
@@ -87,8 +94,15 @@ export async function commentRoutes(app: FastifyInstance) {
         });
       }
 
-      // Check ticket exists
-      const ticket = await prisma.ticket.findUnique({ where: { id: ticketId } });
+      // Check ticket exists - support both UUID and ticket key
+      let whereClause: any = {};
+      if (ticketId.startsWith('TK-')) {
+        whereClause = { key: ticketId };
+      } else {
+        whereClause = { id: ticketId };
+      }
+
+      const ticket = await prisma.ticket.findFirst({ where: whereClause });
 
       if (!ticket) {
         return reply.status(404).send({
@@ -120,12 +134,12 @@ export async function commentRoutes(app: FastifyInstance) {
         });
       }
 
-      // Create comment
+      // Create comment - use ticket.id (UUID) not the Key
       const comment = await prisma.comment.create({
         data: {
           content,
           isInternal: shouldBeInternal,
-          ticketId,
+          ticketId: ticket.id,  // Use UUID from found ticket
           authorId: request.user!.userId,
         },
         include: {
@@ -135,15 +149,20 @@ export async function commentRoutes(app: FastifyInstance) {
         },
       });
 
-      // Log audit
-      await logAudit({
-        actorId: request.user!.userId,
-        action: 'COMMENT_ADDED',
-        entityType: 'Comment',
-        entityId: comment.id,
-        ticketId,
-        newValue: { content: content.substring(0, 100) + '...' },
-      });
+      // Log audit - wrap in try/catch to not fail comment creation
+      try {
+        await logAudit({
+          actorId: request.user!.userId,
+          action: 'COMMENT_ADDED',
+          entityType: 'Comment',
+          entityId: comment.id,
+          ticketId: ticket.id,  // Use UUID
+          newValue: { content: content.substring(0, 100) + '...' },
+        });
+      } catch (auditError) {
+        console.warn('Failed to create audit log for comment:', auditError);
+        // Don't fail the request if audit log fails
+      }
 
       return reply.status(201).send(comment);
     }

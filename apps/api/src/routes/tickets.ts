@@ -78,8 +78,16 @@ export async function ticketRoutes(app: FastifyInstance) {
   app.get('/:id', { preHandler: [requireRole('ADMIN', 'STAFF', 'CUSTOMER')] }, async (request, reply) => {
     const { id } = request.params as { id: string };
 
-    const ticket = await prisma.ticket.findUnique({
-      where: { id },
+    // Support both UUID and ticket key (TK-XXXX)
+    let whereClause: any = {};
+    if (id.startsWith('TK-')) {
+      whereClause = { key: id };
+    } else {
+      whereClause = { id };
+    }
+
+    const ticket = await prisma.ticket.findFirst({
+      where: whereClause,
       include: {
         customer: {
           select: { id: true, name: true, email: true },
@@ -189,7 +197,15 @@ export async function ticketRoutes(app: FastifyInstance) {
         description?: string;
       };
 
-      const existingTicket = await prisma.ticket.findUnique({ where: { id } });
+      // Support both UUID and ticket key
+      let whereClause: any = {};
+      if (id.startsWith('TK-')) {
+        whereClause = { key: id };
+      } else {
+        whereClause = { id };
+      }
+
+      const existingTicket = await prisma.ticket.findFirst({ where: whereClause });
 
       if (!existingTicket) {
         return reply.status(404).send({
@@ -206,17 +222,22 @@ export async function ticketRoutes(app: FastifyInstance) {
       if (updates.status) {
         updateData.status = updates.status.toUpperCase();
         
-        // Log status change
-        await logAudit({
-          actorId: request.user!.userId,
-          action: 'STATUS_CHANGED',
-          entityType: 'Ticket',
-          entityId: id,
-          ticketId: id,
-          field: 'status',
-          oldValue: existingTicket.status,
-          newValue: updateData.status,
-        });
+        // Log status change only if we have a valid user ID
+        try {
+          await logAudit({
+            actorId: request.user!.userId,
+            action: 'STATUS_CHANGED',
+            entityType: 'Ticket',
+            entityId: existingTicket.id,  // Use existingTicket.id for consistency
+            ticketId: existingTicket.id,   // Same as entityId
+            field: 'status',
+            oldValue: existingTicket.status,
+            newValue: updateData.status,
+          });
+        } catch (error) {
+          // Audit log failed but don't fail the update
+          console.warn('Failed to create audit log:', error);
+        }
       }
 
       if (updates.priority) {
@@ -248,7 +269,7 @@ export async function ticketRoutes(app: FastifyInstance) {
       }
 
       const ticket = await prisma.ticket.update({
-        where: { id },
+        where: { id: existingTicket.id },  // Use existingTicket.id for the actual update
         data: updateData,
         include: {
           customer: {
