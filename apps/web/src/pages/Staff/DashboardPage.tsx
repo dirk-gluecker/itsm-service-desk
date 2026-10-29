@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { useTickets, useCurrentUser } from '@/hooks/api/useHooks';
+import { useTickets } from '@/hooks/api/useHooks';
 import type { Ticket } from '@/types';
 import { 
   Button, 
@@ -61,7 +61,6 @@ export const DashboardPage: React.FC = () => {
   );
   const [localSearch, setLocalSearch] = useState(filters.search);
 
-  const { data: currentUser } = useCurrentUser();
   const { data: ticketsResponse, isLoading, error } = useTickets({
     status: filters.status || undefined,
     priority: filters.priority || undefined,
@@ -143,14 +142,14 @@ export const DashboardPage: React.FC = () => {
       header: 'Status',
       sortable: true,
       width: '120px',
-      render: (ticket: Ticket) => <StatusBadge status={ticket.status}>{STATUS_LABELS[ticket.status]}</StatusBadge>,
+      render: (ticket: Ticket) => <StatusBadge status={ticket.status as any}>{STATUS_LABELS[ticket.status]}</StatusBadge>,
     },
     {
       key: 'priority',
       header: 'Priorität',
       sortable: true,
       width: '110px',
-      render: (ticket: Ticket) => <PriorityBadge priority={ticket.priority}>{PRIORITY_LABELS[ticket.priority]}</PriorityBadge>,
+      render: (ticket: Ticket) => <PriorityBadge priority={ticket.priority as any}>{PRIORITY_LABELS[ticket.priority]}</PriorityBadge>,
     },
     {
       key: 'category',
@@ -363,10 +362,6 @@ export const DashboardPage: React.FC = () => {
           <Table<Ticket>
             columns={columns}
             data={ticketsResponse?.data || []}
-            onSort={(key: string, direction: 'asc' | 'desc') => {
-              console.log(`Sort by ${key}, ${direction}`);
-              // TODO: Implement server-side sorting via API params
-            }}
           />
 
           {/* Pagination */}

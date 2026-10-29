@@ -10,10 +10,11 @@ import { MyTicketsPage } from './pages/Customer/MyTicketsPage';
 import { CreateTicketPage } from './pages/Customer/CreateTicketPage';
 import { TicketDetailPage } from './pages/Customer/TicketDetailPage';
 
-// Staff routes (existing)
-import StaffDashboard from './pages/Staff/Dashboard';
-import StaffTickets from './pages/Staff/Tickets';
-import ReportsPage from './pages/ReportsPage';
+// Staff Routes - WP-D Implementation
+import DashboardPage from './pages/Staff/DashboardPage';
+import BoardPage from './pages/Staff/BoardPage';
+import { TicketDetailPage as StaffTicketDetailPage } from './pages/Staff/TicketDetailPage';
+import ReportsPage from './pages/Staff/ReportsPage';
 
 // Auth guards
 import { AuthGuard, PublicRoute } from './lib/authGuard';
@@ -41,9 +42,10 @@ function App() {
           <Route path="/create-ticket" element={<AuthGuard><CreateTicketPage /></AuthGuard>} />
           <Route path="/tickets/:id" element={<AuthGuard><TicketDetailPage /></AuthGuard>} />
 
-          {/* Staff Routes */}
-          <Route path="/staff/dashboard" element={<StaffDashboard />} />
-          <Route path="/staff/tickets" element={<StaffTickets />} />
+          {/* Staff Routes - WP-D Implementation */}
+          <Route path="/staff/dashboard" element={<DashboardPage />} />
+          <Route path="/staff/board" element={<BoardPage />} />
+          <Route path="/staff/tickets/:id" element={<StaffTicketDetailPage />} />
           <Route path="/staff/reports" element={<ReportsPage />} />
           <Route path="/staff/*" element={<Navigate to="/staff/dashboard" replace />} />
           

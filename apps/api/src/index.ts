@@ -9,6 +9,7 @@ import { prisma } from './lib/prisma';
 import { authRoutes } from './routes/auth';
 import { ticketRoutes } from './routes/tickets';
 import { commentRoutes } from './routes/comments';
+import { userRoutes } from './routes/users';
 import type { JWTPayload } from './types/fastify';
 
 const server = Fastify({
@@ -138,6 +139,8 @@ async function registerV1Routes() {
           '/api/v1/tickets/:id',
           '/api/v1/tickets/:id/audit',
           '/api/v1/tickets/:id/comments',
+          '/api/v1/users',
+          '/api/v1/users/:id',
         ],
       });
     },
@@ -147,6 +150,7 @@ async function registerV1Routes() {
   await server.register(authRoutes, { prefix: '/api/v1/auth' });
   await server.register(ticketRoutes, { prefix: '/api/v1' });
   await server.register(commentRoutes, { prefix: '/api/v1' });
+  await server.register(userRoutes, { prefix: '/api/v1' });
 }
 
 // Error handler

@@ -3,9 +3,8 @@
  * Dashboard with charts: tickets per status, new tickets trend, avg resolution time, tickets per assignee
  */
 import React, { useState, useMemo } from 'react';
-import { useTickets, useUsers } from '../../hooks/api/useHooks';
-import type { Ticket, User } from '../../types';
-import { Card } from '@itsm/shared-components';
+import { useTickets, useUsers } from '@/hooks/api/useHooks';
+import { Card } from '@shared/components';
 
 interface ReportData {
   ticketsPerStatus: Record<string, number>;
@@ -21,9 +20,8 @@ const formatDate = (date: Date): string => {
 
 const getDaysArray = (days: number): string[] => {
   const dates: string[] = [];
-  const end = new Date();
   for (let i = days - 1; i >= 0; i--) {
-    const d = new Date(end);
+    const d = new Date();
     d.setDate(d.getDate() - i);
     dates.push(formatDate(d));
   }

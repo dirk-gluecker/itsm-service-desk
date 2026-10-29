@@ -5,16 +5,33 @@
  */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useTickets, useCurrentUser, useUpdateTicket } from '../../hooks/api/useHooks';
-import type { Ticket, User } from '../../types';
+import { useTickets, useCurrentUser, useUpdateTicket } from '@/hooks/api/useHooks';
+import type { Ticket } from '@/types';
 import { 
   Button, 
-  Badge, 
   StatusBadge, 
   PriorityBadge,
   Card,
-  LoadingSpinner,
-} from '@itsm/shared-components';
+} from '@/components/shared';
+
+// German label mappings
+const STATUS_LABELS: Record<string, string> = {
+  open: 'Offen',
+  in_progress: 'In Bearbeitung',
+  done: 'Erledigt',
+};
+
+const PRIORITY_LABELS: Record<string, string> = {
+  low: 'Niedrig',
+  medium: 'Mittel',
+  high: 'Hoch',
+  critical: 'Kritisch',
+};
+
+const CATEGORY_LABELS: Record<string, string> = {
+  incident: 'Incident',
+  service_request: 'Service Request',
+};
 
 // Column definitions in German (per PLAN.md WP-D)
 const COLUMNS = [
@@ -28,10 +45,6 @@ interface FilterState {
   category: string;
   assigneeId: string;
   search: string;
-}
-
-interface DraggableTicket extends Ticket {
-  isDragging?: boolean;
 }
 
 export const BoardPage: React.FC = () => {
@@ -54,7 +67,7 @@ export const BoardPage: React.FC = () => {
     limit: 100, // Fetch more for board view
   });
 
-  const [tickets, setTickets] = useState<Record<string, DraggableTicket[]>>({
+  const [tickets, setTickets] = useState<Record<string, Ticket[]>>({
     open: [],
     in_progress: [],
     done: [],
@@ -62,7 +75,6 @@ export const BoardPage: React.FC = () => {
 
   const [draggedTicket, setDraggedTicket] = useState<Ticket | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
-  const [keyboardFocusedTicket, setKeyboardFocusedTicket] = useState<string | null>(null);
   const [showAssigneePicker, setShowAssigneePicker] = useState<{ ticketId: string; position: { x: number; y: number } } | null>(null);
   const assigneePickerRef = useRef<HTMLDivElement>(null);
 
@@ -89,7 +101,7 @@ export const BoardPage: React.FC = () => {
   // Group tickets by status when data loads
   useEffect(() => {
     if (ticketsResponse?.data) {
-      const grouped: Record<string, DraggableTicket[]> = {
+      const grouped: Record<string, Ticket[]> = {
         open: [],
         in_progress: [],
         done: [],
@@ -110,8 +122,7 @@ export const BoardPage: React.FC = () => {
         // Client-side category filtering
         if (filters.category && ticket.category !== filters.category) return;
 
-        const draggableTicket: DraggableTicket = { ...ticket };
-        grouped[ticket.status].push(draggableTicket);
+        grouped[ticket.status].push(ticket);
       });
 
       // Sort each column by updated_at (newest first)
@@ -141,28 +152,28 @@ export const BoardPage: React.FC = () => {
     }
 
     try {
-      await updateMutation.mutateAsync(ticket.id, updateData);
+      await updateMutation.mutateAsync({ 
+        id: ticket.id, 
+        updates: updateData 
+      });
       await refetch(); // Refresh data from server
       
       // Update local state optimistically
       setTickets(prev => {
         const newTickets = { ...prev };
-        const removed = newTickets[currentStatus].find(t => t.id === ticket.id);
         
         // Remove from old column
         newTickets[currentStatus] = prev[currentStatus].filter(t => t.id !== ticket.id);
         
-        // Add to new column (will be re-sorted by effect)
-        if (removed) {
-          newTickets[newStatus] = [...prev[newStatus], { ...removed, status: newStatus }];
-        }
+        // Add to new column with updated status
+        const updatedTicket: Ticket = { ...ticket, status: newStatus };
+        newTickets[newStatus] = [...prev[newStatus], updatedTicket];
         
         return newTickets;
       });
     } catch (err) {
       console.error('Failed to move ticket:', err);
       alert(`Fehler beim Bewegen des Tickets: ${(err as Error).message}`);
-      // TODO: Show proper error toast
     }
   }, [currentUser, updateMutation, refetch]);
 
@@ -201,12 +212,12 @@ export const BoardPage: React.FC = () => {
         // Move to next column
         const colIndex = COLUMNS.findIndex(c => c.id === columnId);
         if (colIndex < COLUMNS.length - 1) {
-          await moveToColumn(ticket, COLUMNS[colIndex + 1].status);
+          const newStatus = COLUMNS[colIndex + 1].status;
+          await moveToColumn(ticket, newStatus);
           // Focus the same position in new column
           const newIndex = tickets[columnId].indexOf(ticket);
-          const nextCol = COLUMNS[colIndex + 1].status;
           setTimeout(() => {
-            const targetCard = document.getElementById(`ticket-${tickets[nextCol][newIndex]?.id}`);
+            const targetCard = document.getElementById(`ticket-${tickets[newStatus][newIndex]?.id}`);
             targetCard?.focus();
           }, 100);
         }
@@ -217,12 +228,12 @@ export const BoardPage: React.FC = () => {
         // Move to previous column
         const prevColIndex = COLUMNS.findIndex(c => c.id === columnId);
         if (prevColIndex > 0) {
-          await moveToColumn(ticket, COLUMNS[prevColIndex - 1].status);
+          const prevStatus = COLUMNS[prevColIndex - 1].status;
+          await moveToColumn(ticket, prevStatus);
           // Focus the same position in previous column
           const newIndex = tickets[columnId].indexOf(ticket);
-          const prevCol = COLUMNS[prevColIndex - 1].status;
           setTimeout(() => {
-            const targetCard = document.getElementById(`ticket-${tickets[prevCol][newIndex]?.id}`);
+            const targetCard = document.getElementById(`ticket-${tickets[prevStatus][newIndex]?.id}`);
             targetCard?.focus();
           }, 100);
         }
@@ -247,7 +258,6 @@ export const BoardPage: React.FC = () => {
         
       case 'Escape':
         setShowAssigneePicker(null);
-        setKeyboardFocusedTicket(null);
         break;
     }
   };
@@ -279,18 +289,6 @@ export const BoardPage: React.FC = () => {
   };
 
   const hasActiveFilters = Object.values(filters).some(v => v !== '');
-
-  const PRIORITY_LABELS: Record<string, string> = {
-    low: 'Niedrig',
-    medium: 'Mittel',
-    high: 'Hoch',
-    critical: 'Kritisch',
-  };
-
-  const CATEGORY_LABELS: Record<string, string> = {
-    incident: 'Incident',
-    service_request: 'Service Request',
-  };
 
   if (error) {
     return (
@@ -416,12 +414,12 @@ export const BoardPage: React.FC = () => {
               borderRadius: 'var(--radius-lg)',
               padding: 'var(--spacing-md)',
             }}>
-              <h3 style={{ margin: 0 0 'var(--spacing-md)', fontSize: 'var(--font-size-base)' }}>
+              <h3 style={{ margin: ['0', '0', 'var(--spacing-md)'].join(' '), fontSize: 'var(--font-size-base)' }}>
                 {col.label}
               </h3>
               {[...Array(3)].map((_, i) => (
                 <Card key={i} style={{ padding: 'var(--spacing-md)', marginBottom: 'var(--spacing-sm)' }}>
-                  <SkeletonLoader height={60} />
+                  <div style={{ height: 60, background: 'var(--color-neutral-200)', borderRadius: 'var(--radius-default)' }} />
                 </Card>
               ))}
             </div>
@@ -510,7 +508,7 @@ export const BoardPage: React.FC = () => {
                         padding: 'var(--spacing-md)',
                         cursor: 'grab',
                         boxShadow: 'var(--shadow-sm)',
-                        border: `2px solid ${keyboardFocusedTicket === ticket.id ? 'var(--color-primary-focus)' : 'transparent'}`,
+                        border: '2px solid transparent',
                         outline: 'none',
                         transition: 'box-shadow var(--duration-fast), transform var(--duration-fast)',
                         opacity: draggedTicket?.id === ticket.id ? 0.5 : 1,
@@ -622,7 +620,7 @@ export const BoardPage: React.FC = () => {
                                 fontSize: '10px',
                                 fontWeight: 'bold',
                               }}>
-                                {currentUser?.name?.charAt(0).toUpperCase() || '?'}
+                                {(ticket as any).assignee_name?.charAt(0).toUpperCase() || '?'}
                               </span>
                               <span>
                                 {(ticket as any).assignee_name || 'Zugewiesen'}
@@ -633,7 +631,7 @@ export const BoardPage: React.FC = () => {
                               color: 'var(--color-text-tertiary)',
                               fontStyle: 'italic',
                             }}>
-                              Unzugewiesen (Klicken)
+                              Unzugewiesen
                             </span>
                           )}
                         </div>
@@ -675,7 +673,7 @@ export const BoardPage: React.FC = () => {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
             <Button
-              variant="neutral"
+              variant="ghost"
               style={{ 
                 justifyContent: 'flex-start',
                 fontSize: 'var(--font-size-sm)',
@@ -693,7 +691,7 @@ export const BoardPage: React.FC = () => {
               Mir zuweisen (ich)
             </Button>
             <Button
-              variant="neutral"
+              variant="ghost"
               style={{ 
                 justifyContent: 'flex-start',
                 fontSize: 'var(--font-size-sm)',
@@ -708,7 +706,7 @@ export const BoardPage: React.FC = () => {
               Anderen Agenten wählen...
             </Button>
             <Button
-              variant="neutral"
+              variant="ghost"
               style={{ 
                 justifyContent: 'flex-start',
                 fontSize: 'var(--font-size-sm)',
@@ -729,37 +727,5 @@ export const BoardPage: React.FC = () => {
     </div>
   );
 };
-
-const STATUS_LABELS: Record<string, string> = {
-  open: 'Offen',
-  in_progress: 'In Bearbeitung',
-  done: 'Erledigt',
-};
-
-const PRIORITY_LABELS: Record<string, string> = {
-  low: 'Niedrig',
-  medium: 'Mittel',
-  high: 'Hoch',
-  critical: 'Kritisch',
-};
-
-const CATEGORY_LABELS: Record<string, string> = {
-  incident: 'Incident',
-  service_request: 'Service Request',
-};
-
-// Skeleton component for loading states
-const SkeletonLoader: React.FC<{ height: number; style?: React.CSSProperties }> = ({ height, style }) => (
-  <div 
-    style={{
-      background: 'linear-gradient(90deg, var(--color-neutral-200) 25%, var(--color-neutral-100) 50%, var(--color-neutral-200) 75%)',
-      backgroundSize: '200% 100%',
-      animation: 'shimmer 1.5s infinite',
-      borderRadius: 'var(--radius-default)',
-      height: `${height}px`,
-      ...style,
-    }}
-  />
-);
 
 export default BoardPage;

@@ -40,10 +40,10 @@ export const authAPI = {
 // Comments API
 export const commentsAPI = {
   getByTicketId: (ticketId: string) => 
-    api.get(`/v1/comments?ticketId=${ticketId}`),
+    api.get(`/v1/tickets/${ticketId}/comments`),
   
   create: (ticketId: string, data: { content: string; is_internal?: boolean }) => 
-    api.post(`/v1/comments`, { ...data, ticketId }),
+    api.post(`/v1/tickets/${ticketId}/comments`, data),
 }
 
 // Users API

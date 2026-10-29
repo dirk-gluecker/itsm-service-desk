@@ -15,7 +15,7 @@ import {
   LoadingSpinner,
   Select,
   SelectOption,
-} from '../../../../packages/shared/components';
+} from '@/components/shared';
 
 // Label mappings (German for customer-facing UI)
 const STATUS_LABELS: Record<string, string> = {
