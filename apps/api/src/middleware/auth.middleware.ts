@@ -21,6 +21,7 @@ export async function attachUser(
   const authHeader = request.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // @ts-ignore - Allow undefined for unauthenticated requests
     request.user = undefined;
     return;
   }
@@ -36,6 +37,7 @@ export async function attachUser(
       ...(payload.type && { type: payload.type }),
     };
   } catch {
+    // @ts-ignore - Allow undefined when JWT verification fails
     request.user = undefined;
     // Don't throw - we'll let route-level guards handle this
   }
