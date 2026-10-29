@@ -5,3 +5,6 @@ dist/
 .env.local
 .prisma/client/
 coverage/
+*.db
+test-results/
+playwright-report/

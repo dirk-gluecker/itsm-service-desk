@@ -1,0 +1,158 @@
+// Prisma Schema for ITSM Service Desk "Desk"
+// SQLite for development, PostgreSQL-ready
+// WP-A Scope: Backend Core + Shared Types
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum Role {
+  ADMIN
+  STAFF
+  CUSTOMER
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  DONE
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum TicketCategory {
+  INCIDENT
+  SERVICE_REQUEST
+  QUERY
+  OTHER
+}
+
+// ============================================================
+// MODELS
+// ============================================================
+
+model User {
+  id            String        @id @default(uuid())
+  email         String        @unique
+  passwordHash  String
+  name          String
+  role          Role          @default(CUSTOMER)
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  lastLoginAt   DateTime?
+
+  // Relations
+  ticketsCreated    Ticket[]      @relation("CustomerTickets")
+  ticketsAssigned   Ticket[]      @relation("StaffTickets")
+  comments          Comment[]
+  auditLogs         AuditLog[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Ticket {
+  id          String           @id @default(uuid())
+  key         String           @unique // Human-readable ticket key (e.g., TK-0001)
+  title       String           // Max 200 chars validated at API level
+  description String           // Min 20 chars validated at API level
+  status      TicketStatus     @default(OPEN)
+  priority    TicketPriority   @default(MEDIUM)
+  category    TicketCategory   @default(INCIDENT)
+  
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  
+  // Relations
+  customer      User          @relation("CustomerTickets", fields: [customerId], references: [id])
+  customerId    String
+  assignee      User?         @relation("StaffTickets", fields: [assigneeId], references: [id])
+  assigneeId    String?
+  
+  comments      Comment[]
+  auditLogs     AuditLog[]
+
+  @@index([status])
+  @@index([priority])
+  @@index([customerId])
+  @@index([assigneeId])
+  @@index([createdAt])
+}
+
+model Comment {
+  id          String      @id @default(uuid())
+  content     String      // Min 1 char validated at API level
+  isInternal  Boolean     @default(false) // Internal notes visible only to staff/admin
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  // Relations
+  ticket      Ticket      @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  ticketId    String
+  author      User        @relation(fields: [authorId], references: [id])
+  authorId    String
+
+  @@index([ticketId])
+  @@index([authorId])
+  @@index([isInternal])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  
+  // What was changed
+  action      String   // e.g., "CREATED", "UPDATED", "STATUS_CHANGED", "ASSIGNED"
+  field       String?  // Specific field that changed (nullable for entity-level actions)
+  oldValue    String?  // JSON string of old value (stored as text in SQLite, JSON in Postgres)
+  newValue    String?  // JSON string of new value
+  
+  metadata    String?  // Additional context as JSON string
+  
+  // Who did it and when
+  timestamp   DateTime @default(now())
+  actor       User     @relation(fields: [actorId], references: [id])
+  actorId     String
+  
+  // Which entity
+  entityType  String   // "Ticket", "Comment", "User"
+  entityId    String   // ID of affected entity
+  
+  // Link to ticket if applicable
+  ticket      Ticket?  @relation(fields: [ticketEntityId], references: [id])
+  ticketEntityId String?
+
+  @@index([timestamp])
+  @@index([actorId])
+  @@index([entityType, entityId])
+  @@index([ticketEntityId])
+}
+
+// Optional: Role model for future RBAC extensions
+model RoleDefinition {
+  id          String    @id @default(uuid())
+  name        String    @unique // ADMIN, STAFF, CUSTOMER
+  description String?
+  permissions Json?     // Store permission flags as JSON
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("roles")
+}

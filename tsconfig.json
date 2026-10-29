@@ -10,6 +10,9 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "declaration": true,
-    "declarationMap": true
-  }
+    "declarationMap": true,
+    "types": ["@prisma/client"]
+  },
+  "include": ["apps/**/*.ts", "packages/**/*.ts"],
+  "exclude": ["node_modules"]
 }
