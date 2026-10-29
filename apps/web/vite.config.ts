@@ -12,6 +12,8 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    host: '0.0.0.0',
+    allowedHosts: ['frontend-w2eq0fwfa.gobrev.dev', 'localhost'],
     proxy: {
       '/api': {
         target: 'http://localhost:3000',

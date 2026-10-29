@@ -1,0 +1,123 @@
+/* Button Component Styles */
+/* Uses CSS variables from design-tokens.ts */
+
+.itsm-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-default);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-default);
+  white-space: nowrap;
+}
+
+/* Focus states for accessibility */
+.itsm-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.itsm-button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Disabled state */
+.itsm-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Variants */
+.itsm-button--primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.itsm-button--primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.itsm-button--primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.itsm-button--secondary {
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-default);
+}
+
+.itsm-button--secondary:hover:not(:disabled) {
+  background-color: var(--color-neutral-100);
+  border-color: var(--color-border-hover);
+}
+
+.itsm-button--danger {
+  background-color: var(--color-danger);
+  color: var(--color-white);
+}
+
+.itsm-button--danger:hover:not(:disabled) {
+  background-color: var(--color-danger-hover);
+}
+
+.itsm-button--ghost {
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  border: none;
+}
+
+.itsm-button--ghost:hover:not(:disabled) {
+  background-color: var(--color-neutral-100);
+  color: var(--color-text-primary);
+}
+
+/* Sizes */
+.itsm-button--sm {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  min-height: 32px;
+}
+
+.itsm-button--md {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
+  min-height: 40px;
+}
+
+.itsm-button--lg {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-lg);
+  min-height: 48px;
+}
+
+/* Full width */
+.itsm-button--full-width {
+  width: 100%;
+}
+
+/* Loading spinner */
+.itsm-button__loader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.itsm-button__icon {
+  display: flex;
+  align-items: center;
+}
+
+/* Spinner keyframes */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

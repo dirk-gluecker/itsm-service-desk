@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+coverage/
+test-results/
+playwright-report/
+
+# Git
+.git/
+.gitignore
+
+# Prisma (will be generated)
+prisma/dev.db
+prisma/migrations/
+!.prisma/client/
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Misc
+*.md
+!README.md

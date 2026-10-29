@@ -5,8 +5,8 @@
  */
 
 import React, { forwardRef, useCallback } from 'react';
-import { css, cx } from 'lit-css'; // Assuming lit-css or similar for styling
 import { StatusType, PriorityType } from '../design-tokens';
+import './Button.css';
 
 // Types
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
@@ -21,101 +21,6 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   fullWidth?: boolean;
   disabled?: boolean;
 }
-
-// Styles using CSS variables from design tokens
-const styles = {
-  base: css`
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-sm);
-    font-family: var(--font-family-sans);
-    font-weight: var(--font-weight-medium);
-    border-radius: var(--radius-default);
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all var(--duration-fast) var(--ease-default);
-    white-space: nowrap;
-    
-    &:focus:not(:focus-visible) {
-      outline: none;
-    }
-    
-    &:focus-visible {
-      outline: none;
-      box-shadow: var(--shadow-outline);
-    }
-    
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  `,
-  
-  variants: {
-    primary: css`
-      background-color: var(--color-primary);
-      color: var(--color-text-inverse);
-      
-      &:hover:not(:disabled) {
-        background-color: var(--color-primary-hover);
-      }
-      
-      &:active:not(:disabled) {
-        transform: translateY(1px);
-      }
-    `,
-    secondary: css`
-      background-color: var(--color-bg-surface);
-      color: var(--color-text-primary);
-      border-color: var(--color-border-default);
-      
-      &:hover:not(:disabled) {
-        background-color: var(--color-neutral-100);
-        border-color: var(--color-border-hover);
-      }
-      
-      &:active:not(:disabled) {
-        background-color: var(--color-neutral-200);
-      }
-    `,
-    danger: css`
-      background-color: var(--color-danger);
-      color: var(--color-text-inverse);
-      
-      &:hover:not(:disabled) {
-        background-color: var(--color-danger-hover);
-      }
-    `,
-    ghost: css`
-      background-color: transparent;
-      color: var(--color-text-secondary);
-      
-      &:hover:not(:disabled) {
-        background-color: var(--color-neutral-100);
-        color: var(--color-text-primary);
-      }
-    `,
-  },
-  
-  sizes: {
-    sm: css`
-      padding: var(--spacing-xs) var(--spacing-sm);
-      font-size: var(--font-size-sm);
-      min-height: 32px;
-    `,
-    md: css`
-      padding: var(--spacing-sm) var(--spacing-md);
-      font-size: var(--font-size-base);
-      min-height: 40px;
-    `,
-    lg: css`
-      padding: var(--spacing-sm) var(--spacing-lg);
-      font-size: var(--font-size-lg);
-      min-height: 48px;
-    `,
-  },
-};
 
 /**
  * Button Component Implementation
@@ -134,7 +39,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     fullWidth = false,
     disabled = false,
     children,
-    className,
+    className = '',
     ...props
   },
   ref
@@ -147,18 +52,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     props.onClick?.(e);
   }, [isLoading, disabled, props.onClick]);
 
-  const combinedStyles = cx(
-    styles.base,
-    styles.variants[variant],
-    styles.sizes[size],
-    fullWidth && 'width: 100%',
+  const baseClasses = `itsm-button itsm-button--${variant} itsm-button--${size}`;
+  const finalClassName = [
+    baseClasses,
+    fullWidth ? 'itsm-button--full-width' : '',
     className
-  );
+  ].filter(Boolean).join(' ');
 
   return (
     <button
       ref={ref}
-      className={combinedStyles}
+      className={finalClassName}
       disabled={disabled || isLoading}
       aria-busy={isLoading}
       {...props}
@@ -166,49 +70,20 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     >
       {isLoading ? (
         <>
-          <LoadingSpinner size={size === 'sm' ? 'sm' : 'md'} />
+          <span className="itsm-button__loader" />
           {children}
         </>
       ) : (
         <>
-          {!isLoading && leftIcon && <span aria-hidden="true">{leftIcon}</span>}
+          {!isLoading && leftIcon && <span aria-hidden="true" className="itsm-button__icon itsm-button__icon--left">{leftIcon}</span>}
           {children}
-          {!isLoading && rightIcon && <span aria-hidden="true">{rightIcon}</span>}
+          {!isLoading && rightIcon && <span aria-hidden="true" className="itsm-button__icon itsm-button__icon--right">{rightIcon}</span>}
         </>
       )}
     </button>
   );
 });
 
-// Loading spinner subcomponent
-function LoadingSpinner({ size }: { size: 'sm' | 'md' }) {
-  const dimensions = size === 'sm' ? '16px' : '20px';
-  
-  return (
-    <span
-      style={{
-        width: dimensions,
-        height: dimensions,
-        border: `2px solid currentColor`,
-        borderTopColor: 'transparent',
-        borderRadius: '50%',
-        animation: 'spin 0.6s linear infinite',
-      }}
-      role="status"
-      aria-label="Loading"
-    />
-  );
-}
-
-// Add keyframes for spinner animation
-if (typeof document !== 'undefined') {
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  `;
-  document.head.appendChild(style);
-}
+Button.displayName = 'Button';
 
 export default Button;
