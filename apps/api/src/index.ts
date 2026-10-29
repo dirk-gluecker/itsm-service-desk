@@ -5,12 +5,12 @@ import rateLimit from '@fastify/rate-limit';
 import swagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
 import jwt from '@fastify/jwt';
-import { prisma } from './lib/prisma';
-import { authRoutes } from './routes/auth';
-import { ticketRoutes } from './routes/tickets';
-import { commentRoutes } from './routes/comments';
-import { userRoutes } from './routes/users';
-import type { JWTPayload } from './types/fastify';
+import { prisma } from './lib/prisma.js';
+import { authRoutes } from './routes/auth.js';
+import { ticketRoutes } from './routes/tickets.js';
+import { commentRoutes } from './routes/comments.js';
+import { userRoutes } from './routes/users.js';
+import type { JWTPayload } from './types/fastify.js';
 
 const server = Fastify({
   logger: {

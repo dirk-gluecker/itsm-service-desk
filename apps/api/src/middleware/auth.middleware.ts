@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import type { JWTPayload, AuthenticatedUser } from '../types/fastify';
+import type { JWTPayload, AuthenticatedUser } from '../types/fastify.js';
 
 // Re-export constants
 export const ROLES = {

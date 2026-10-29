@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
-import { prisma } from '../lib/prisma';
-import { requireRole } from '../middleware/rbac';
-import { logAudit } from '../utils/audit';
+import { prisma } from '../lib/prisma.js';
+import { requireRole } from '../middleware/rbac.js';
+import { logAudit } from '../utils/audit.js';
 
 export async function commentRoutes(app: FastifyInstance) {
   /**

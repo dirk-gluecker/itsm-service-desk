@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import type { AuthenticatedUser } from '../types/fastify';
+import type { AuthenticatedUser } from '../types/fastify.js';
 
 export type UserRole = AuthenticatedUser['role'];
 

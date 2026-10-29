@@ -1,4 +1,4 @@
-import { prisma } from '../lib/prisma';
+import { prisma } from '../lib/prisma.js';
 
 export type AuditAction = 'CREATED' | 'UPDATED' | 'DELETED' | 'STATUS_CHANGED' | 'ASSIGNED' | 'USER_CREATED' | 'TICKET_DELETED' | 'COMMENT_ADDED' | 'TICKET_CREATED';
 

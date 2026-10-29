@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MockTicketRepository } from '../../shared/test/db-utils';
+import { MockTicketRepository } from '../../shared/test/db-utils.js';
 
 describe('Ticket Service', () => {
   let repository: MockTicketRepository;

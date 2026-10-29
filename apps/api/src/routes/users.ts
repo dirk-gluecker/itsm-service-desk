@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
-import { prisma } from '../lib/prisma';
-import { requireRole } from '../middleware/rbac';
+import { prisma } from '../lib/prisma.js';
+import { requireRole } from '../middleware/rbac.js';
 
 /**
  * Users routes - for fetching staff/assignees and user details

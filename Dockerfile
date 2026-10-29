@@ -6,21 +6,21 @@ ENV PORT=3000
 ENV HOST=0.0.0.0
 ENV DATABASE_URL="postgresql://itsm_user:itsm_password@db:5432/itsm?schema=public"
 
-# Install dependencies
+# Install dependencies including prisma
 COPY package.json package-lock.json* ./
 COPY apps/api/package.json ./apps/api/
 RUN npm install --legacy-peer-deps && \
     npm uninstall @prisma/client prisma && \
-    npm install @prisma/client@5.14.0 prisma@5.14.0 --legacy-peer-deps
+    npm install @prisma/client@6.19.0 prisma@6.19.0 --legacy-peer-deps
 
-# Copy Prisma schema and generate client first
+# Copy Prisma schema and generate client (creates .prisma in root)
 COPY apps/api/prisma ./apps/api/prisma
 RUN npx prisma generate --schema=/app/apps/api/prisma/schema.prisma
 
-# Then copy pre-built API dist (Prisma client already generated)
+# Now copy pre-built API dist
 COPY apps/api/dist ./apps/api/dist
 
-# Remove unnecessary dev packages to reduce size  
+# Remove unnecessary dev packages  to reduce size  
 RUN rm -rf apps/api/node_modules/vitest apps/api/node_modules/@types/vitest apps/api/node_modules/esbuild 2>/dev/null || true
 
 EXPOSE 3000

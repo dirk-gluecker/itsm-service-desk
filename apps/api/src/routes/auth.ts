@@ -1,9 +1,9 @@
 import { FastifyInstance } from 'fastify';
 import bcrypt from 'bcryptjs';
-import { prisma } from '../lib/prisma';
-import { requireRole } from '../middleware/rbac';
-import { logAudit } from '../utils/audit';
-import type { JWTPayload } from '../lib/auth';
+import { prisma } from '../lib/prisma.js';
+import { requireRole } from '../middleware/rbac.js';
+import { logAudit } from '../utils/audit.js';
+import type { JWTPayload } from '../lib/auth.js';
 
 const SALT_ROUNDS = 10;
 

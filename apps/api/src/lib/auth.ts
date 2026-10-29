@@ -1,5 +1,5 @@
 // Re-export types for backwards compatibility
-export type { JWTPayload, AuthenticatedUser } from '../types/fastify';
+export type { JWTPayload, AuthenticatedUser } from '../types/fastify.js';
 
 import jwt from '@fastify/jwt';
 
