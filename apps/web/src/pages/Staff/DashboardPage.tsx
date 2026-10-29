@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { useTickets } from '@/hooks/api/useHooks';
+import { useTickets } from '../../hooks/api/useHooks';
 import type { Ticket } from '@/types';
 import { 
   Button, 

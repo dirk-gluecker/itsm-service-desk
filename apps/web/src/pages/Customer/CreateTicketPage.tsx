@@ -3,7 +3,7 @@
  */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCreateTicket } from '../hooks/api/useHooks';
+import { useCreateTicket } from '../../hooks/api/useHooks';
 import { Button, Input, Select } from '@shared/components';
 import { Card } from '@shared/components';
 import type { Category, Priority, ErrorResponse } from '../types';

@@ -25,3 +25,10 @@ declare module 'fastify' {
     user?: AuthenticatedUser;
   }
 }
+
+// Extend @fastify/jwt types
+declare module '@fastify/jwt' {
+  interface FastifyJWT {
+    user: AuthenticatedUser;
+  }
+}

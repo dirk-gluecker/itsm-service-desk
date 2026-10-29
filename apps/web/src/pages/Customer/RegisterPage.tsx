@@ -3,7 +3,7 @@
  */
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useRegister } from '../hooks/api/useHooks';
+import { useRegister } from '../../hooks/api/useHooks';
 import { Button, Input } from '@shared/components';
 import { Card } from '@shared/components';
 import type { ErrorResponse } from '../types';

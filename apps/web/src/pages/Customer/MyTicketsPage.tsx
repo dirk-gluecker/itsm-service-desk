@@ -3,7 +3,7 @@
  */
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTickets, useLogout } from '../hooks/api/useHooks';
+import { useTickets, useLogout } from '../../hooks/api/useHooks';
 import { Button, Table, Badge, LoadingSpinner } from '@shared/components';
 import type { Ticket, Status, Priority } from '../types';
 

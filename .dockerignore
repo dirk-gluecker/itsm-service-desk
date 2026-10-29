@@ -2,10 +2,11 @@
 node_modules/
 npm-debug.log*
 
-# Build outputs
-dist/
-build/
-*.tsbuildinfo
+# Build outputs (we copy local builds)
+!**/dist/
+apps/api/node_modules/
+apps/web/node_modules/
+packages/*/node_modules/
 
 # Environment
 .env
@@ -31,16 +32,7 @@ playwright-report/
 .git/
 .gitignore
 
-# Prisma (will be generated)
-prisma/dev.db
-prisma/migrations/
-!.prisma/client/
-
-# Docker
-Dockerfile*
-docker-compose*.yml
-.dockerignore
-
 # Misc
 *.md
 !README.md
+!apps/api/README.md

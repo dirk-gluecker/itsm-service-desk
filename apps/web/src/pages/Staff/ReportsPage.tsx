@@ -3,7 +3,7 @@
  * Dashboard with charts: tickets per status, new tickets trend, avg resolution time, tickets per assignee
  */
 import React, { useState, useMemo } from 'react';
-import { useTickets, useUsers } from '@/hooks/api/useHooks';
+import { useTickets, useUsers } from '../../hooks/api/useHooks';
 import { Card } from '@shared/components';
 
 interface ReportData {

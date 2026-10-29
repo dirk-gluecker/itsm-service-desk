@@ -3,7 +3,7 @@
  */
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useTicket, useComments, useCreateComment, useAuditLogs } from '../hooks/api/useHooks';
+import { useTicket, useComments, useCreateComment, useAuditLogs } from '../../hooks/api/useHooks';
 import { Button, Card, Badge, LoadingSpinner } from '@shared/components';
 import type { Comment, AuditLog, Status, Priority } from '../types';
 
