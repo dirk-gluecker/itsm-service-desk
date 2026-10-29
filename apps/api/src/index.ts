@@ -148,9 +148,9 @@ async function registerV1Routes() {
 
   // Register route groups
   await server.register(authRoutes, { prefix: '/api/v1/auth' });
-  await server.register(ticketRoutes, { prefix: '/api/v1' });
-  await server.register(commentRoutes, { prefix: '/api/v1' });
-  await server.register(userRoutes, { prefix: '/api/v1' });
+  await server.register(ticketRoutes, { prefix: '/api/v1/tickets' });
+  await server.register(commentRoutes, { prefix: '/api/v1/comments' });
+  await server.register(userRoutes, { prefix: '/api/v1/users' });
 }
 
 // Error handler

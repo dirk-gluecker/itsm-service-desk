@@ -171,9 +171,9 @@ export async function authRoutes(app: FastifyInstance) {
       },
     });
 
-    // Log audit
+    // Log audit (use new user ID as actor since it now exists)
     await logAudit({
-      actorId: 'system',
+      actorId: user.id,
       action: 'USER_CREATED',
       entityType: 'User',
       entityId: user.id,
