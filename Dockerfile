@@ -13,11 +13,11 @@ RUN npm install --legacy-peer-deps && \
     npm uninstall @prisma/client prisma && \
     npm install @prisma/client@5.14.0 prisma@5.14.0 --legacy-peer-deps
 
-# Copy Prisma schema and generate client (uses DATABASE_URL above)
+# Copy Prisma schema and generate client first
 COPY apps/api/prisma ./apps/api/prisma
 RUN npx prisma generate --schema=/app/apps/api/prisma/schema.prisma
 
-# Copy pre-built API dist from local build  
+# Then copy pre-built API dist (Prisma client already generated)
 COPY apps/api/dist ./apps/api/dist
 
 # Remove unnecessary dev packages to reduce size  
