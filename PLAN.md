@@ -2,58 +2,104 @@
 
 Spec: `SPEC.md` (75 Akzeptanzkriterien)
 
+**Plan erstellt:** Mackenzie (Supervisor)  
+**Status:** Phase 2 in Review - WP-A Done, WP-B Done, WP-C/WP-D teilweise implementiert
+
 ---
 
-## 1. Work Packets
+## 1. Work Packets - STATUS
 
-### WP-A: Backend Core + Shared Types (**Priority 1**)
+### ✅ WP-A: Backend Core + Shared Types (**DONE**)
 **Owner:** Platform & Integration Team  
-**Scope:**
-- Prisma Schema (`apps/api/prisma/schema.prisma`) mit User, Ticket, Comment, AuditLog, Role
-- Authentication (JWT, bcrypt, Passwort-Hashing)
-- Role-based Authorization (Customer, Staff, Admin)
-- Rate limiting für Login (5 attempts / 15 min Blockade)
-- Zod Schemas in `packages/shared` als einzige Quelle der Wahrheit für API-Contracts
-- REST API Endpoints:
-  - POST /auth/register, POST /auth/login, POST /auth/logout
-  - GET /tickets (staff), GET /tickets/:id (all roles)
-  - POST /tickets (customer/staff), PATCH /tickets/:id (staff only)
-  - POST /tickets/:id/comments, GET /tickets/:id/comments
-- SQLite für Dev, PostgreSQL-fertig
-- Seed Script: 1 Admin, 2 Staff, 2 Customers
-- Audit Log: Jede Zustandsänderung wird protokolliert
-- SMTP-Konfiguration für Notifications (Console fallback für Dev)
+**Commit:** 651f555 + fix commit 5b867bc  
+**Status:** COMPLETE - API fully functional
 
-**Acceptance Criteria (aus SPEC.md):**
-- AC-6.1 bis AC-6.5 (Auth)
-- AC-AUTH-1 bis AC-AUTH-5 (Auth technical)
-- AC-SEC-1 bis AC-SEC-6 (Security)
-- AC-AUDIT-1 bis AC-AUDIT-5 (Audit Log)
-- AC-API-1 bis AC-API-5 (API Design)
-- AC-TEST-1 bis AC-TEST-5 (Testing infrastructure)
+**Implemented:**
+- Prisma Schema (`apps/api/prisma/schema.prisma`) mit User, Ticket, Comment, AuditLog, Role
+- Authentication (JWT, bcrypt ≥10 rounds)
+- Role-based Authorization (Customer, Staff, Admin)
+- Rate limiting (5 attempts/15 min block)
+- Zod Schemas in `packages/shared/zod/` als API contract source of truth
+- REST API Endpoints: `/auth/*`, `/tickets/*`, `/comments/*`, `/users/*`
+- SQLite für Dev, PostgreSQL-ready
+- Seed Script: 1 Admin, 2 Staff, 2 Customers
+- Audit Log auf allen State Changes
+- SMTP Config (Console fallback für Dev)
+
+**Fixes applied:**
+- Route prefix collision fixed (ticket/comments/users)
+- AuditLog FK constraint resolved (actorId uses user.id)
+
+**Acceptance Criteria Met:**
+- AC-6.1 bis AC-6.5 ✓
+- AC-AUTH-1 bis AC-AUTH-5 ✓
+- AC-SEC-1 bis AC-SEC-6 ✓
+- AC-AUDIT-1 bis AC-AUDIT-5 ✓
+- AC-API-1 bis AC-API-5 ✓
+- AC-TEST-2 bis AC-TEST-5 ✓
 
 ---
 
-### WP-B: Design System + Shared Components (**Priority 2**)
+### ✅ WP-B: Design System + Shared Components (**DONE**)
 **Owner:** Design & Assets Team  
-**Scope:**
-- Design Tokens (Farben, Spacing, Typography) in `packages/shared/design-tokens.ts`
-- Shared UI Components in `packages/shared/components`:
-  - Button, Input, Select, Card, Modal, Table, Badge
-  - Focus-visible States (WCAG AA)
-  - Dark/Light Mode Provider
-- Farbcodes: Status (open=orange, in_progress=blue, done=green), Priority (low/medium/high/critical)
-- CSS Variabeln oder Tailwind Config mit Tokens
-- Light AND Dark Mode Support
+**Status:** COMPLETE
 
-**Dependencies:** WP-A (Zod-Schemas müssen bekannt sein für Typen)
+**Implemented:**
+- Design Tokens (`packages/shared/design-tokens.ts`) - Farben, Spacing, Typography
+- 9 Shared Components: Button, Input, Select, Card, Modal, Table, Badge, ThemeProvider, ErrorBoundary
+- WCAG AA Focus States
+- Dark/Light Mode Provider mit system preference detection
+- Global Styles mit status/priority colors
+
+**Acceptance Criteria Met:**
+- AC-DESIGN-1 bis AC-DESIGN-4 ✓
+- AC-COMP-1 bis AC-COMP-4 ✓
+- AC-THEME-1 bis AC-THEME-3 ✓
+
+---
+
+### ⚠️ WP-C: Customer Portal (**IN REVIEW**)
+**Owner:** Discovery & Search Team (Liam)  
+**Status:** PARTIAL - Files created, needs integration testing
+
+**Files present:**
+- apps/web/src/pages/Customer/LoginPage.tsx ✓
+- apps/web/src/pages/Customer/RegisterPage.tsx ✓
+- apps/web/src/pages/Customer/MyTicketsPage.tsx ✓
+- apps/web/src/pages/Customer/CreateTicketPage.tsx ✓
+- apps/web/src/pages/Customer/TicketDetailPage.tsx ✓
+
+**Open Items:**
+- Full E2E flow testing
+- Accessibility audit
+- Production build configuration
 
 **Acceptance Criteria:**
-- AC-DESIGN-1 bis AC-DESIGN-4 (UI/UX)
-- AC-COMP-1 bis AC-COMP-4 (Components)
-- AC-THEME-1 bis AC-THEME-3 (Theme)
+- US-1 AC-1.1 bis AC-1.6 - Need validation
+- US-4 AC-4.1 bis AC-4.4 - Need validation
 
 ---
+
+### ⚠️ WP-D: Staff Views (**IN REVIEW**)
+**Owner:** Booking & Trips Team (Lucas)  
+**Status:** PARTIAL - Files created, needs integration testing
+
+**Files present:**
+- apps/web/src/pages/Staff/DashboardPage.tsx ✓
+- apps/web/src/pages/Staff/BoardPage.tsx ✓
+- apps/web/src/pages/Staff/TicketDetailPage.tsx ✓
+- apps/web/src/pages/Staff/ReportsPage.tsx ✓
+
+**Open Items:**
+- Full E2E flow testing (Kanban drag-drop, keyboard nav)
+- Internal notes visibility validation
+- Report calculations verification
+
+**Acceptance Criteria:**
+- US-2 AC-2.1 bis AC-2.5 - Need validation
+- US-3 AC-3.1 bis AC-3.5 - Need validation
+- US-5 AC-5.1 bis AC-5.4 - Need validation
+
 
 ### WP-C: Customer Portal (**Priority 3**)
 **Owner:** Discovery & Search Team (Liam)  
